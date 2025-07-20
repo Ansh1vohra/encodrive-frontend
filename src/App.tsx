@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router-dom'
+import {Helmet} from "react-helmet";
 import './App.css'
 import Header from './components/Header'
 import Footer from './components/Footer'
@@ -12,6 +13,15 @@ import Docs from './pages/Docs'
 function App() {
   return (
     <>
+    <Helmet>
+    <title>Encodrive – End-to-End File Encryption SaaS</title>
+    <meta name="description" content="Easily add end-to-end encrypted file storage to your app. Developer-first, scalable, and secure." />
+    <meta property="og:title" content="Encodrive" />
+    <meta property="og:description" content="Easily add end-to-end encrypted file storage to your app." />
+    <meta property="og:image" content="/logo.jpg" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+  </Helmet>
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />
