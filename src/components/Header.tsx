@@ -1,22 +1,45 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../index.css';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [signin, setSignin] = useState<boolean>(false);
+
+  useEffect(() => {
+    let token = sessionStorage.getItem('encodriveusertoken');
+    if (token) {
+      setSignin(true);
+    }
+  }, [])
 
   return (
     <header className="flex items-center justify-between px-8 py-4 border-b border-gray-200 bg-[#4963c1] sticky top-0 z-50">
-      <div className="cursor-pointer p-2" onClick={() => navigate('/')}> 
+
+      <div className="cursor-pointer p-2" onClick={() => navigate(signin ? '/dashboard' : '/')}>
         <img src='/logo.jpg' alt="EncoDrive Logo" className="h-7" />
       </div>
       {/* Desktop Nav */}
       <nav className="hidden md:flex gap-5">
-        <Link to="/" className="text-gray-200 no-underline font-medium hover:text-white transition-colors">Home</Link>
+        <Link to={signin ? '/dashboard' : '/'} className="text-gray-200 no-underline font-medium hover:text-white transition-colors">Home</Link>
+        {/* <Link to="/" className="text-gray-200 no-underline font-medium hover:text-white transition-colors">Home</Link> */}
         <Link to="/docs" className="text-gray-200 no-underline font-medium hover:text-white transition-colors">Docs</Link>
         <Link to="/pricing" className="text-gray-200 no-underline font-medium hover:text-white transition-colors">Pricing</Link>
-        <Link to='/signin' className='text-gray-200 no-underline font-medium hover:text-white transition-colors'>Signin</Link>
+        {signin ? (
+          <button
+            className="text-gray-200 no-underline font-medium hover:text-white transition-colors"
+            onClick={() => {
+              sessionStorage.removeItem('encodriveusertoken');
+              setSignin(false);
+              navigate('/');
+            }}
+          >
+            Sign Out
+          </button>
+        ) : (
+          <Link to='/signin' className='text-gray-200 no-underline font-medium hover:text-white transition-colors'>Signin</Link>
+        )}
       </nav>
       {/* Hamburger for Mobile */}
       <button
@@ -46,10 +69,32 @@ const Header: React.FC = () => {
               &times;
             </button>
             <nav className="flex flex-col gap-6 mt-10">
-              <Link to="/" className="text-gray-200 no-underline font-medium hover:text-white transition-colors" onClick={() => setMenuOpen(false)}>Home</Link>
+              <Link to={signin ? '/dashboard' : '/'} className="text-gray-200 no-underline font-medium hover:text-white transition-colors" onClick={() => setMenuOpen(false)}>Home</Link>
+              {/* <Link to="/" className="text-gray-200 no-underline font-medium hover:text-white transition-colors" onClick={() => setMenuOpen(false)}>Home</Link> */}
               <Link to="/docs" className="text-gray-200 no-underline font-medium hover:text-white transition-colors" onClick={() => setMenuOpen(false)}>Docs</Link>
               <Link to="/pricing" className="text-gray-200 no-underline font-medium hover:text-white transition-colors" onClick={() => setMenuOpen(false)}>Pricing</Link>
-              <Link to='/signin' className='text-gray-200 no-underline font-medium hover:text-white transition-colors' onClick={() => setMenuOpen(false)}>Signin</Link>
+              {signin ? (
+                <button
+                  className="text-gray-200 no-underline font-medium hover:text-white transition-colors"
+                  onClick={() => {
+                    sessionStorage.removeItem('encodriveusertoken');
+                    setSignin(false);
+                    setMenuOpen(false);
+                    navigate('/');
+                  }}
+                >
+                  Sign Out
+                </button>
+              ) : (
+                <Link
+                  to="/signin"
+                  className="text-gray-200 no-underline font-medium hover:text-white transition-colors"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Signin
+                </Link>
+              )}
+
             </nav>
           </div>
         </div>

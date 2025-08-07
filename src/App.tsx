@@ -14,7 +14,7 @@ function App() {
   return (
     <>
     <Helmet>
-    <title>Encodrive – End-to-End File Encryption SaaS</title>
+    <title>Encodrive - End-to-End File Encryption SaaS</title>
     <meta name="description" content="Easily add end-to-end encrypted file storage to your app. Developer-first, scalable, and secure." />
     <meta property="og:title" content="Encodrive" />
     <meta property="og:description" content="Easily add end-to-end encrypted file storage to your app." />
