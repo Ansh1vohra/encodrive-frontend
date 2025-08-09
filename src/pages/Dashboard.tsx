@@ -1,5 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js';
+import { Doughnut } from 'react-chartjs-2';
+
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
+
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -143,31 +148,50 @@ export default function Dashboard() {
         {/* === Monitoring Section === */}
         <section>
           <h2 className="text-lg font-semibold mb-4">Usage & Monitoring</h2>
-          <div className="mb-4">
-            <div className="flex justify-between mb-1">
-              <span>Storage Used</span>
-              <span>{mockUsage.storage} MB / {mockUsage.storageLimit} MB</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded h-3 mb-2">
-              <div
-                className="bg-[#4963c1] h-3 rounded"
-                style={{ width: `${(mockUsage.storage / mockUsage.storageLimit) * 100}%` }}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Storage Usage */}
+            <div className="bg-white p-4 rounded shadow flex flex-col items-center">
+              <h3 className="mb-2 font-medium">Storage Usage</h3>
+              <Doughnut
+                data={{
+                  labels: ['Used', 'Remaining'],
+                  datasets: [{
+                    data: [mockUsage.storage, mockUsage.storageLimit - mockUsage.storage],
+                    backgroundColor: ['#4963c1', '#e0e7ff'],
+                  }],
+                }}
               />
+              <p className="mt-3 text-sm text-gray-600">
+                {mockUsage.storage} MB / {mockUsage.storageLimit} MB
+              </p>
             </div>
-            <div className="flex justify-between mb-1">
-              <span>Bandwidth Used</span>
-              <span>{mockUsage.bandwidth} MB / {mockUsage.bandwidthLimit} MB</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded h-3 mb-2">
-              <div
-                className="bg-[#4963c1] h-3 rounded"
-                style={{ width: `${(mockUsage.bandwidth / mockUsage.bandwidthLimit) * 100}%` }}
+
+            {/* Bandwidth Usage */}
+            <div className="bg-white p-4 rounded shadow flex flex-col items-center">
+              <h3 className="mb-2 font-medium">Bandwidth Usage</h3>
+              <Doughnut
+                data={{
+                  labels: ['Used', 'Remaining'],
+                  datasets: [{
+                    data: [mockUsage.bandwidth, mockUsage.bandwidthLimit - mockUsage.bandwidth],
+                    backgroundColor: ['#f59e0b', '#fef3c7'],
+                  }],
+                }}
               />
+              <p className="mt-3 text-sm text-gray-600">
+                {mockUsage.bandwidth} MB / {mockUsage.bandwidthLimit} MB
+              </p>
             </div>
-            <div className="flex justify-between mb-1">
-              <span>Files Uploaded</span>
-              <span>{mockUsage.files}</span>
-            </div>
+          </div>
+
+          {/* Upgrade button */}
+          <div className="mt-10 text-center">
+            <button
+              onClick={() => navigate('/pricing')}
+              className="px-6 py-3 bg-[#4963c1] text-white rounded hover:bg-[#3a52a8] transition"
+            >
+              Upgrade Plan
+            </button>
           </div>
         </section>
       </div>
