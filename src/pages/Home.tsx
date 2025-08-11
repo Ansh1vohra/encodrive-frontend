@@ -8,7 +8,6 @@ import {
   FaServer,
   FaChartLine,
   FaRegCopy,
-  FaCheck
 } from "react-icons/fa";
 
 import PricingComp from "../components/PricingComp";
