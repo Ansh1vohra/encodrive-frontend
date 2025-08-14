@@ -117,6 +117,15 @@ await drive.uploadFile(file);`;
     hidden: { opacity: 0, y: 28 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
   };
+  // New variants for improved page animations
+  const staggerContainer: any = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.12 } },
+  };
+  const fadeInUpItem: any = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
+  };
 
   return (
     <motion.div
@@ -134,14 +143,14 @@ await drive.uploadFile(file);`;
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-10 md:gap-0">
             {/* Left: Text */}
-            <div className="w-full md:w-1/2 mt-8 md:mt-0">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 md:mb-6 leading-tight">
+            <motion.div className="w-full md:w-1/2 mt-8 md:mt-0" variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}>
+              <motion.h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 md:mb-6 leading-tight" variants={fadeInUpItem}>
                 End-to-End File Encryption Made Simple
-              </h1>
-              <p className="text-base sm:text-lg md:text-xl mb-6 md:mb-8 opacity-90">
+              </motion.h1>
+              <motion.p className="text-base sm:text-lg md:text-xl mb-6 md:mb-8 opacity-90" variants={fadeInUpItem}>
                 Secure your files with our developer-friendly solution. Install our npm package, encrypt client-side, and upload securely to AWS S3.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 sm:gap-0 sm:space-x-4 w-full">
+              </motion.p>
+              <motion.div className="flex flex-col sm:flex-row gap-4 sm:gap-0 sm:space-x-4 w-full" variants={fadeInUpItem}>
                 <a
                   href="/signin"
                   className="bg-white text-[#4963c1] hover:bg-gray-100 px-6 py-3 rounded-md text-base sm:text-lg font-medium text-center"
@@ -155,12 +164,20 @@ await drive.uploadFile(file);`;
                 >
                   How It Works
                 </a>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
             {/* Right: Code Block */}
             <div className="w-full md:w-1/2 flex justify-center">
-              <div className="bg-white/20 p-4 sm:p-6 rounded-xl backdrop-blur-sm w-full max-w-md">
+              <motion.div
+                className="bg-white/20 p-4 sm:p-6 rounded-xl backdrop-blur-sm w-full max-w-md"
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                whileHover={{ y: -6, scale: 1.02 }}
+                whileTap={{ scale: 0.99 }}
+              >
                 <div className="bg-white text-gray-800 p-4 sm:p-6 rounded-lg shadow-lg relative">
                   <div className="flex items-center mb-3 sm:mb-4">
                     <span className="bg-[#4963c1] text-white p-2 rounded-md mr-3">
@@ -193,7 +210,7 @@ await drive.uploadFile(file);`;
                     )}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>
@@ -209,7 +226,7 @@ await drive.uploadFile(file);`;
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <motion.div className="grid md:grid-cols-3 gap-8" variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
             {[
               {
                 icon: <FaLock className="text-3xl mb-4 text-[#4963c1]" />,
@@ -242,16 +259,19 @@ await drive.uploadFile(file);`;
                 description: "Comprehensive docs, SDKs, and client libraries.",
               },
             ].map((feature, index) => (
-              <div
+              <motion.div
                 key={index}
                 className="bg-white p-8 rounded-lg shadow-md transition-all duration-300 feature-card hover:shadow-xl transform hover:-translate-y-1"
+                variants={fadeInUpItem}
+                whileHover={{ y: -6, scale: 1.02 }}
+                whileTap={{ scale: 0.99 }}
               >
                 {feature.icon}
                 <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
                 <p className="text-gray-600">{feature.description}</p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </motion.section>
 
@@ -279,11 +299,13 @@ await drive.uploadFile(file);`;
                   visibleSteps[index] ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                 }`}
               >
-                <div className="w-16 h-16 bg-[#4963c1] text-white text-2xl font-bold rounded-full flex items-center justify-center mx-auto mb-4">
-                  {step.step}
-                </div>
-                <h3 className="text-xl font-bold mb-2">{step.title}</h3>
-                <p className="text-gray-600">{step.description}</p>
+                <motion.div whileHover={{ y: -4 }} transition={{ type: "spring", stiffness: 300, damping: 22 }}>
+                  <div className="w-16 h-16 bg-[#4963c1] text-white text-2xl font-bold rounded-full flex items-center justify-center mx-auto mb-4">
+                    {step.step}
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">{step.title}</h3>
+                  <p className="text-gray-600">{step.description}</p>
+                </motion.div>
               </div>
             ))}
           </div>

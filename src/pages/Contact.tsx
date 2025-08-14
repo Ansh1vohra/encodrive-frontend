@@ -70,7 +70,7 @@ export default function Contact() {
           </form>
         )}
         <div className="mt-10 border-t pt-6 text-center text-gray-500 text-sm">
-          <div>Email: <a href="mailto:support@encodrive.com" className="text-[#4963c1] hover:underline">support@encodrive.com</a></div>
+          <div>Email: <a href="mailto:encodriveweb@gmail.com" className="text-[#4963c1] hover:underline">encodriveweb@gmail.com</a></div>
           <div className="mt-1">Encodrive, India</div>
         </div>
       </div>

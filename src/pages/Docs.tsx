@@ -71,7 +71,7 @@ export default function Docs() {
         {/* Support */}
         <section>
           <h2 className="text-xl font-bold mb-2 text-[#4963c1]">Need Help?</h2>
-          <p className="text-gray-700">Contact our support team at <a href="mailto:support@encodrive.com" className="text-[#4963c1] underline">support@encodrive.com</a> or visit the <a href="/contact" className="text-[#4963c1] underline">Contact page</a>.</p>
+          <p className="text-gray-700">Contact our support team at <a href="mailto:encodriveweb@gmail.com" className="text-[#4963c1] underline">encodriveweb@gmail.com</a> or visit the <a href="/contact" className="text-[#4963c1] underline">Contact page</a>.</p>
         </section>
       </div>
     </div>
