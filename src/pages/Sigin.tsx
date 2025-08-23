@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Toaster, toast } from 'react-hot-toast'; // Make sure to install react-hot-toast
 const API_URL = import.meta.env.VITE_API_URL;
 import { GoogleLogin } from "@react-oauth/google";
@@ -10,6 +10,14 @@ export default function Signin() {
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+
+  // Check if user is already signed in
+  useEffect(() => {
+    const token = sessionStorage.getItem('encodriveusertoken');
+    if (token) {
+      window.location.href = '/dashboard';
+    }
+  }, []);
 
   const handleGoogleSignIn = async (credentialResponse: any) => {
     try {
