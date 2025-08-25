@@ -1,7 +1,7 @@
 import { useState } from "react";
 const codeSnippets = {
-  install: 'npm install encodrive-client',
-  init: `import { Encodrive } from 'encodrive-client';\n\nconst drive = new Encodrive({\n  apiKey: 'YOUR_API_KEY',\n  encryptionKey: 'USER_PROVIDED_KEY'\n});`,
+  install: 'npm install encodrive',
+  init: `import { Encodrive } from 'encodrive';\n\nconst drive = new Encodrive({\n  apiKey: 'YOUR_API_KEY',\n  encryptionKey: 'USER_PROVIDED_KEY'\n});`,
   upload: 'await drive.uploadFile(file);',
   options: `options: {\n  apiKey: string; // Your API key from dashboard\n  encryptionKey: string; // Your own encryption key\n}`
 };

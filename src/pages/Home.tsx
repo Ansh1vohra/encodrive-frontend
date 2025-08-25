@@ -183,7 +183,7 @@ await drive.uploadFile(file);`;
                     <span className="bg-[#4963c1] text-white p-2 rounded-md mr-3">
                       <FaCode />
                     </span>
-                    <h3 className="font-mono font-bold text-sm sm:text-base">npm install encodrive-client</h3>
+                    <h3 className="font-mono font-bold text-sm sm:text-base">npm install encodrive</h3>
                   </div>
 
                   <div className="relative">
