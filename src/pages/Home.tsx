@@ -214,7 +214,7 @@ await drive.uploadFile(file);`;
             </div>
           </div>
         </div>
-      </motion.section>
+      </motion.section>  
 
       {/* FEATURES */}
       <motion.section id="features" className="py-16 bg-gray-50" variants={sectionVariants}>
