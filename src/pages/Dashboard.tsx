@@ -38,6 +38,21 @@ export default function Dashboard() {
     percentage: 0
   });
   const [copiedLinks, setCopiedLinks] = useState<{[key: number]: boolean}>({});
+  
+  // Upload states
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [encryptionKey, setEncryptionKey] = useState('');
+  const [uploadStatus, setUploadStatus] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  
+  // Download states
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [selectedDownloadFile, setSelectedDownloadFile] = useState<FileData | null>(null);
+  const [downloadEncryptionKey, setDownloadEncryptionKey] = useState('');
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadStatus, setDownloadStatus] = useState('');
+
   const navigate = useNavigate();
 
   const handleCopy = () => {
@@ -182,6 +197,123 @@ export default function Dashboard() {
     fetchUserFiles();
   };
 
+  // Upload functionality
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null;
+    setSelectedFile(file);
+    setUploadStatus('');
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      setUploadStatus('Please select a file first');
+      return;
+    }
+
+    if (!encryptionKey) {
+      setUploadStatus('Please provide an encryption key');
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+      setUploadStatus('Initializing upload...');
+
+      // Dynamically import the encodrive package
+      const { Encodrive } = await import('encodrive');
+
+      const drive = new Encodrive({
+        apiKey: userApiKey,
+        encryptionKey: encryptionKey
+      });
+
+      setUploadStatus('Encrypting and uploading file...');
+
+      const result = await drive.uploadFile(selectedFile);
+
+      setUploadStatus('Upload successful!');
+      
+      // Refresh files list and close modal after a delay
+      setTimeout(() => {
+        setShowUploadModal(false);
+        setSelectedFile(null);
+        setEncryptionKey('');
+        fetchUserFiles();
+      }, 1500);
+
+    } catch (error) {
+      console.error('Upload error:', error);
+      setUploadStatus(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // Download functionality
+  const handleDownload = async (file: FileData) => {
+    if (!downloadEncryptionKey) {
+      setDownloadStatus('Please provide the encryption key');
+      return;
+    }
+
+    try {
+      setIsDownloading(true);
+      setDownloadStatus('Downloading and decrypting file...');
+
+      // Dynamically import the encodrive package
+      const { Encodrive } = await import('encodrive');
+
+      const drive = new Encodrive({
+        apiKey: userApiKey,
+        encryptionKey: downloadEncryptionKey
+      });
+
+      // Get decrypted Blob
+      const { blob, metadata } = await drive.downloadFile(file.url);
+
+      // Create an object URL and trigger download
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.name || "downloaded-file";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      // Cleanup
+      window.URL.revokeObjectURL(url);
+
+      setDownloadStatus('Download completed! File saved to your device.');
+      
+      // Close modal after a delay
+      setTimeout(() => {
+        setShowDownloadModal(false);
+        setSelectedDownloadFile(null);
+        setDownloadEncryptionKey('');
+      }, 1500);
+
+    } catch (error) {
+      console.error('Download error:', error);
+      setDownloadStatus(`Download failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  const openDownloadModal = (file: FileData) => {
+    setSelectedDownloadFile(file);
+    setDownloadEncryptionKey('');
+    setDownloadStatus('');
+    setShowDownloadModal(true);
+  };
+
+  const openUploadModal = () => {
+    setSelectedFile(null);
+    setEncryptionKey('');
+    setUploadStatus('');
+    setShowUploadModal(true);
+  };
+
   if (loading) {
     return (
       <div className="relative flex justify-center items-center min-h-screen">
@@ -219,7 +351,7 @@ export default function Dashboard() {
                 Install our npm package and use this key to encrypt and upload files.
               </p>
               <code className="block bg-gray-100 p-2 rounded text-sm mb-3 font-mono break-all">
-                npm install encodrive-client
+                npm install encodrive
               </code>
               <button
                 className="px-4 py-2 bg-[#4963c1] text-white rounded-lg hover:bg-[#3a52a8] transition-colors"
@@ -325,6 +457,12 @@ export default function Dashboard() {
               <h2 className="text-xl font-semibold text-gray-800 mb-4 sm:mb-0">Your Files</h2>
               <div className="flex items-center gap-3">
                 <button
+                  onClick={openUploadModal}
+                  className="px-4 py-2 bg-[#4963c1] text-white rounded-lg hover:bg-[#3a52a8] transition-colors"
+                >
+                  📁 Upload File
+                </button>
+                <button
                   onClick={handleRefreshFiles}
                   disabled={filesLoading}
                   className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
@@ -385,15 +523,24 @@ export default function Dashboard() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{file.date}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{file.size}</td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          {file.url && (
+                          <div className="flex space-x-2">
+                            {file.url && (
+                              <button
+                                onClick={() => handleCopyLink(i, file.url)}
+                                className="px-3 py-1 bg-[#4963c1] text-white rounded-lg text-sm hover:bg-[#3a52a8] transition-colors"
+                                title="Copy encrypted file link"
+                              >
+                                {copiedLinks[i] ? '✓ Copied' : 'Copy Link'}
+                              </button>
+                            )}
                             <button
-                              onClick={() => handleCopyLink(i, file.url)}
-                              className="px-3 py-1 bg-[#4963c1] text-white rounded-lg text-sm hover:bg-[#3a52a8] transition-colors"
-                              title="Copy encrypted file link"
+                              onClick={() => openDownloadModal(file)}
+                              className="px-3 py-1 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition-colors"
+                              title="Download and decrypt file"
                             >
-                              {copiedLinks[i] ? '✓ Copied' : 'Copy Link'}
+                              Download
                             </button>
-                          )}
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -404,6 +551,138 @@ export default function Dashboard() {
           </section>
         </div>
       </div>
+
+      {/* Upload Modal */}
+      {showUploadModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold mb-4 text-gray-800">Upload File</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select File
+                </label>
+                <input
+                  type="file"
+                  onChange={handleFileSelect}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                />
+                {selectedFile && (
+                  <p className="text-sm text-gray-600 mt-2">
+                    Selected: <span className="font-medium">{selectedFile.name}</span>
+                    ({Math.round(selectedFile.size / 1024)} KB)
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Encryption Key
+                </label>
+                <input
+                  type="password"
+                  value={encryptionKey}
+                  onChange={(e) => setEncryptionKey(e.target.value)}
+                  placeholder="Enter encryption key"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Remember this key! You'll need it to download the file.
+                </p>
+              </div>
+
+              {uploadStatus && (
+                <div className={`p-3 rounded-lg text-sm ${
+                  uploadStatus.includes('successful') 
+                    ? 'bg-green-50 text-green-700 border border-green-200' 
+                    : uploadStatus.includes('failed')
+                    ? 'bg-red-50 text-red-700 border border-red-200'
+                    : 'bg-blue-50 text-blue-700 border border-blue-200'
+                }`}>
+                  {uploadStatus}
+                </div>
+              )}
+
+              <div className="flex space-x-3 pt-4">
+                <button
+                  onClick={handleUpload}
+                  disabled={isUploading || !selectedFile || !encryptionKey}
+                  className="flex-1 px-4 py-3 bg-[#4963c1] text-white font-medium rounded-lg hover:bg-[#3a52a8] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isUploading ? 'Encrypting & Uploading...' : 'Upload File'}
+                </button>
+                <button
+                  onClick={() => setShowUploadModal(false)}
+                  className="px-4 py-3 bg-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-400 transition-colors duration-200"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Download Modal */}
+      {showDownloadModal && selectedDownloadFile && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold mb-4 text-gray-800">Download File</h3>
+            
+            <div className="space-y-4">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p className="font-medium text-gray-700">File: {selectedDownloadFile.name}</p>
+                <p className="text-sm text-gray-600">Size: {selectedDownloadFile.size}</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Encryption Key
+                </label>
+                <input
+                  type="password"
+                  value={downloadEncryptionKey}
+                  onChange={(e) => setDownloadEncryptionKey(e.target.value)}
+                  placeholder="Enter encryption key used for upload"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Enter the same key used when uploading this file.
+                </p>
+              </div>
+
+              {downloadStatus && (
+                <div className={`p-3 rounded-lg text-sm ${
+                  downloadStatus.includes('completed') 
+                    ? 'bg-green-50 text-green-700 border border-green-200' 
+                    : downloadStatus.includes('failed')
+                    ? 'bg-red-50 text-red-700 border border-red-200'
+                    : 'bg-blue-50 text-blue-700 border border-blue-200'
+                }`}>
+                  {downloadStatus}
+                </div>
+              )}
+
+              <div className="flex space-x-3 pt-4">
+                <button
+                  onClick={() => handleDownload(selectedDownloadFile)}
+                  disabled={isDownloading || !downloadEncryptionKey}
+                  className="flex-1 px-4 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isDownloading ? 'Downloading...' : 'Download File'}
+                </button>
+                <button
+                  onClick={() => setShowDownloadModal(false)}
+                  className="px-4 py-3 bg-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-400 transition-colors duration-200"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
