@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
+// import {Encodrive} from 'encodrive';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
@@ -229,7 +230,8 @@ export default function Dashboard() {
 
       setUploadStatus('Encrypting and uploading file...');
 
-      const result = await drive.uploadFile(selectedFile);
+      // const result = 
+      await drive.uploadFile(selectedFile);
 
       setUploadStatus('Upload successful!');
       
@@ -261,7 +263,7 @@ export default function Dashboard() {
       setDownloadStatus('Downloading and decrypting file...');
 
       // Dynamically import the encodrive package
-      const { Encodrive } = await import('encodrive');
+      const { Encodrive } = await import('encodrive') ;
 
       const drive = new Encodrive({
         apiKey: userApiKey,
@@ -269,7 +271,8 @@ export default function Dashboard() {
       });
 
       // Get decrypted Blob
-      const { blob, metadata } = await drive.downloadFile(file.url);
+      // const { blob, metadata } = await drive.downloadFile(file.url);
+      const { blob} = await drive.downloadFile(file.url);
 
       // Create an object URL and trigger download
       const url = window.URL.createObjectURL(blob);
