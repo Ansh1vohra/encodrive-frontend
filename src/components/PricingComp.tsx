@@ -1,5 +1,7 @@
+
 import { motion } from "framer-motion";
 import { FaCheck } from "react-icons/fa";
+import SubscribeButton from './SubscribeButton';
 
 export default function PricingComp() {
     return (
@@ -74,9 +76,7 @@ export default function PricingComp() {
                         <motion.div
                             key={index}
                             className={`relative rounded-2xl overflow-hidden transition-all duration-300 ${
-                                plan.highlight 
-                                    ? 'ring-2 ring-[#4963c1] shadow-2xl border-0' 
-                                    : 'border border-gray-200 shadow-lg'
+                                plan.highlight ? 'ring-2 ring-[#4963c1] shadow-2xl border-0' : 'border border-gray-200 shadow-lg'
                             }`}
                             initial={{ opacity: 0, y: 40 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -117,16 +117,22 @@ export default function PricingComp() {
                                 </div>
 
                                 {/* CTA Button */}
-                                <a
-                                    href={plan.name === "Enterprise" ? "/contact" : "/signin"}
-                                    className={`w-full text-center py-4 px-6 rounded-xl font-semibold transition-all duration-200 ${
-                                        plan.highlight
-                                            ? 'bg-gradient-to-r from-[#4963c1] to-[#3a52a8] text-white hover:shadow-lg hover:from-[#3a52a8] hover:to-[#2a3a7a]'
-                                            : 'bg-gray-100 text-[#4963c1] hover:bg-gray-200 hover:text-[#3a52a8]'
-                                    }`}
-                                >
-                                    {plan.cta}
-                                </a>
+                                {plan.name === 'Pro' ? (
+                                    <SubscribeButton planKey="pro">
+                                        <span className={`w-full block ${plan.highlight ? 'text-white' : 'text-[#4963c1]'}`}>{plan.cta}</span>
+                                    </SubscribeButton>
+                                ) : (
+                                    <a
+                                        href={plan.name === "Enterprise" ? "/contact" : "/signin"}
+                                        className={`w-full text-center py-4 px-6 rounded-xl font-semibold transition-all duration-200 ${
+                                            plan.highlight
+                                                ? 'bg-gradient-to-r from-[#4963c1] to-[#3a52a8] text-white hover:shadow-lg hover:from-[#3a52a8] hover:to-[#2a3a7a]'
+                                                : 'bg-gray-100 text-[#4963c1] hover:bg-gray-200 hover:text-[#3a52a8]'
+                                        }`}
+                                    >
+                                        {plan.cta}
+                                    </a>
+                                )}
                             </div>
                         </motion.div>
                     ))}
